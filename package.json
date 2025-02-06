@@ -1,0 +1,13 @@
+{
+  "name": "odot-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
