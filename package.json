@@ -9,14 +9,16 @@
     "dev": "nodemon --watch \"src/**/*.ts\" -e ts --exec \"npx tsc && node dist/index.js\""
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "nodemon": "^3.1.9",
-    "typescript": "^5.7.3",
     "@antfu/eslint-config": "^4.1.1",
-    "eslint": "^9.19.0"
+    "@types/express": "^5.0.0",
+    "eslint": "^9.19.0",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3"
   },
   "private": true,
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "env-var": "^7.5.0",
     "express": "^4.21.2",
     "winston": "^3.17.0"
   }
