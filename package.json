@@ -4,10 +4,20 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch \"src/**/*.ts\" -e ts --exec \"npx tsc && node dist/index.js\""
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "@types/express": "^5.0.0",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3",
+    "@antfu/eslint-config": "^4.1.1",
+    "eslint": "^9.19.0"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "express": "^4.21.2",
+    "winston": "^3.17.0"
+  }
 }
