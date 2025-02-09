@@ -47,7 +47,7 @@ async function sendMail(mailOptions: MailOptions): Promise<void> {
  * @param code 验证码
  * @param email 收件人邮箱地址
  */
-async function sendVerificationCode(code: string, email: string): Promise<void> {
+async function sendVerificationCode(email: string, code: string): Promise<void> {
   await sendMail({
     to: email,
     subject: '您的验证码',
