@@ -34,7 +34,7 @@ async function sendMail(mailOptions: MailOptions): Promise<void> {
       ...mailOptions,
       from: formattedFrom,
     })
-    logger.log('Message sent: %s', info.messageId)
+    logger.info('Message sent: %s', info.messageId)
   }
   catch (error) {
     logger.error('Error occurred while sending email:', error)
