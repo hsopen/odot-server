@@ -7,6 +7,12 @@ export const emailValidator = [
     .withMessage('请提供有效的邮箱地址'),
 ]
 
+/**
+ * 捕获req中的错误
+ * @param req
+ * @param res
+ * @param next
+ */
 export function handleValidationErrors(req: Request, res: Response, next: NextFunction): void {
   const errors = validationResult(req)
 
