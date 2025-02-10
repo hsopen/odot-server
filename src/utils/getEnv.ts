@@ -18,4 +18,5 @@ export default {
   REDID_TLS: env.get('REDID_TLS').required().asJsonObject(),
 
   EMAIL_EXPIRATION_TIME: env.get('EMAIL_EXPIRATION_TIME').required().asInt(),
+  VERIFICATION_CODE_SENDING_INTERVAL: env.get('VERIFICATION_CODE_SENDING_INTERVAL').required().asInt(),
 }
