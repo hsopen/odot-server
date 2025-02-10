@@ -1,13 +1,17 @@
 import type { NextFunction, Request, Response } from 'express'
 import authService from '../services/authService'
+import getEnv from '../utils/getEnv'
 import logger from '../utils/logger'
+import { redisOne, redisZero } from '../utils/redis'
 import { resHandler } from '../utils/resHandler'
 
 const authController = {
-  async getEmailVerificationCode(req: Request, res: Response, _next: NextFunction) {
+  async sendAnEmailVerificationCode(req: Request, res: Response, _next: NextFunction) {
     const data = req.body
     try {
-      await authService.sendVerificationCode(data.email)
+      const code = await authService.sendVerificationCode(data.email)
+      await redisZero.set(data.email, code, 'EX', getEnv.EMAIL_EXPIRATION_TIME)
+      await redisOne.set(data.email, '', 'EX', getEnv.EMAIL_EXPIRATION_TIME)
       resHandler(res, 200, true, 'EmailVerificationCodeWasSentSuccessfully')
     }
     catch (error) {
