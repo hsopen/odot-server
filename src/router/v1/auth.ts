@@ -4,6 +4,6 @@ import { emailValidator, handleValidationErrors } from './middleware/validator'
 
 const router = express.Router()
 
-router.post('/getEmailVerificationCode', emailValidator, handleValidationErrors, authController.getEmailVerificationCode)
+router.post('/sendAnEmailVerificationCode', emailValidator, handleValidationErrors, authController.sendAnEmailVerificationCode)
 
 export default router
