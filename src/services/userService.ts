@@ -5,6 +5,11 @@ import logger from '../utils/logger'
 
 const prisma = new PrismaClient()
 const userService = {
+  /**
+   * 创建用户
+   * @param email 用户邮箱地址
+   * @param password 用户密码
+   */
   async createANewUser(email: string, password: string): Promise<
     'registeredSuccessfully' |
     'registrationFailed' |
