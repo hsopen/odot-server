@@ -34,7 +34,7 @@ async function sendMail(mailOptions: MailOptions): Promise<void> {
       ...mailOptions,
       from: formattedFrom,
     })
-    logger.info('Message sent: %s', info.messageId)
+    logger.info(`Message sent: ${info.messageId}`)
   }
   catch (error) {
     logger.error('Error occurred while sending email:', error)
@@ -44,8 +44,8 @@ async function sendMail(mailOptions: MailOptions): Promise<void> {
 
 /**
  * 发送验证码邮件
- * @param code 验证码
  * @param email 收件人邮箱地址
+ * @param code 验证码
  */
 async function sendVerificationCode(email: string, code: string): Promise<void> {
   await sendMail({
