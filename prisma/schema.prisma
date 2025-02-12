@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model task {
+  id               String  @id(map: "id") @db.Uuid
+  own_user_id      String  @db.Uuid
+  title            String  @db.VarChar(255)
+  remark           String?
+  status           Boolean @default(false)
+  attachments_path Json?
+  priority         Int     @default(0) @db.SmallInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user {
+  id            String   @id(map: "user_pk") @db.Uuid
+  email         String   @unique(map: "user_pk_2") @db.VarChar
+  salt          String   @db.Char(32)
+  password      String   @db.Char(64)
+  nickname      String?  @db.VarChar(255)
+  creation_time DateTime @db.Timestamptz(6)
+}
