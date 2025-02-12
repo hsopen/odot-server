@@ -7,6 +7,11 @@ export const emailValidator = [
     .withMessage('请提供有效的邮箱地址'),
 ]
 
+export const passwordValidator = [
+  body('password')
+    .isLength({ min: 6, max: 32 }),
+]
+
 /**
  * 捕获req中的错误
  * @param req
