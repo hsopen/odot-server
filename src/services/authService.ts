@@ -22,6 +22,11 @@ const authService = {
     }
   },
 
+  /**
+   * 检查验证码
+   * @param email 邮箱地址
+   * @param code 验证码
+   */
   async verificationCode(email: string, code: string): Promise<boolean> {
     const codeValue = await redisZero.get(email)
     return codeValue === code
