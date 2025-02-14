@@ -19,4 +19,6 @@ export default {
 
   EMAIL_EXPIRATION_TIME: env.get('EMAIL_EXPIRATION_TIME').required().asInt(),
   VERIFICATION_CODE_SENDING_INTERVAL: env.get('VERIFICATION_CODE_SENDING_INTERVAL').required().asInt(),
+  JWT_SECRET_KEY: env.get('JWT_SECRET_KEY').required().asString(),
+  JWT_EXPIRATION_TIME: env.get('JWT_EXPIRATION_TIME').required().asInt(),
 }
