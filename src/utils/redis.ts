@@ -8,7 +8,7 @@ const redisZero = new Redis({
   username: getEnv.REDIS_USERNAME,
   password: getEnv.REDIS_PASSWORD,
   db: 0,
-  tls: getEnv.REDID_TLS,
+  tls: getEnv.REDIS_TLS,
 })
 
 const redisOne = new Redis({
@@ -17,7 +17,7 @@ const redisOne = new Redis({
   username: getEnv.REDIS_USERNAME,
   password: getEnv.REDIS_PASSWORD,
   db: 1,
-  tls: getEnv.REDID_TLS,
+  tls: getEnv.REDIS_TLS,
 })
 
 export { redisOne, redisZero }
