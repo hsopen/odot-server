@@ -15,10 +15,14 @@ export default {
   REDIS_PORT: env.get('REDIS_PORT').required().asPortNumber(),
   REDIS_USERNAME: env.get('REDIS_USERNAME').required().asString(),
   REDIS_PASSWORD: env.get('REDIS_PASSWORD').required().asString(),
-  REDID_TLS: env.get('REDID_TLS').required().asJsonObject(),
+  REDIS_TLS: env.get('REDID_TLS').required().asJsonObject(),
 
   EMAIL_EXPIRATION_TIME: env.get('EMAIL_EXPIRATION_TIME').required().asInt(),
   VERIFICATION_CODE_SENDING_INTERVAL: env.get('VERIFICATION_CODE_SENDING_INTERVAL').required().asInt(),
   JWT_SECRET_KEY: env.get('JWT_SECRET_KEY').required().asString(),
   JWT_EXPIRATION_TIME: env.get('JWT_EXPIRATION_TIME').required().asInt(),
+  JWT_TOKEN_COOKIE_MAX_AGE: env.get('JWT_TOKEN_COOKIE_MAX_AGE').required().asInt(),
+  COOKIE_HTTP_ONLY: env.get('COOKIE_HTTP_ONLY').required().asBoolStrict(),
+  COOKIE_SECURE: env.get('COOKIE_SECURE').required().asBoolStrict(),
+  COOKIE_SAME_SITE: env.get('COOKIE_SAME_SITE').required().asEnum(['strict', 'lax', 'none']),
 }

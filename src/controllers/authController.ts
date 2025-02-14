@@ -18,10 +18,10 @@ const authController = {
     const result = await authService.login(data.email, data.password)
     if (result === 'loginSuccessfully') {
       const token = await authService.generateJwtToken(data.email)
-      data.remember
-        ? res.cookie('token', token, { maxAge: 31536000000 })
-        : res.cookie('token', token, {})
 
+      data.remember
+        ? res.cookie('token', token, { maxAge: getEnv.JWT_TOKEN_COOKIE_MAX_AGE, httpOnly: getEnv.COOKIE_HTTP_ONLY, secure: getEnv.COOKIE_SECURE, sameSite: getEnv.COOKIE_SAME_SITE })
+        : res.cookie('token', token, {})
       resHandler(res, 200, true, 'login successfully')
     }
     else if (result === 'loginFailed') {
