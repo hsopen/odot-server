@@ -1,7 +1,9 @@
 import Redis from 'ioredis'
 import getEnv from './getEnv'
 
-// 配置 Redis 连接信息
+/**
+ * 存储注册验证码
+ */
 const redisZero = new Redis({
   host: getEnv.REDIS_HOST,
   port: getEnv.REDIS_PORT,
@@ -11,6 +13,9 @@ const redisZero = new Redis({
   tls: getEnv.REDIS_TLS,
 })
 
+/**
+ * 注册验证码api请求速率控制
+ */
 const redisOne = new Redis({
   host: getEnv.REDIS_HOST,
   port: getEnv.REDIS_PORT,
