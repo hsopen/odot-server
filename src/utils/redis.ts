@@ -25,4 +25,16 @@ const redisOne = new Redis({
   tls: getEnv.REDIS_TLS,
 })
 
-export { redisOne, redisZero }
+/**
+ * 存储修改密码验证验证码
+ */
+const redisTwo = new Redis({
+  host: getEnv.REDIS_HOST,
+  port: getEnv.REDIS_PORT,
+  username: getEnv.REDIS_USERNAME,
+  password: getEnv.REDIS_PASSWORD,
+  db: 2,
+  tls: getEnv.REDIS_TLS,
+})
+
+export { redisOne, redisTwo, redisZero }
