@@ -20,6 +20,7 @@ const userService = {
     catch (err) {
       logger.error(err)
     }
+  },
 
   /**
    * 创建用户

@@ -87,7 +87,7 @@ const authService = {
         return codeValue === code
       }
       catch (err) {
-        // logger.error(err)
+        logger.error(err)
         return false
       }
     }

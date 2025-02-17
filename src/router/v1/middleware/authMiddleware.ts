@@ -50,10 +50,6 @@ export async function getUserIdFromToken(req: Request, res: Response, next: Next
 
     // 将密码修改时间转换为 Unix 时间戳（秒，UTC 时间）
     const passwordModificationTime = Math.floor(user.password_modification_time.getTime() / 1000)
-    console.log(`密码修改时间ISO${user.password_modification_time.toISOString()}`)
-    console.log(`密码修改时间${user.password_modification_time}`)
-    console.log(`jwt发布时间${new Date(jwtIssueTime * 1000).toISOString()}`)
-    console.log(`${passwordModificationTime - jwtIssueTime}`)
     // 对比 JWT 签发时间和密码修改时间
     if (jwtIssueTime < passwordModificationTime) {
       logger.warn(`Token issued before password modification for user: ${decoded.id}`)
