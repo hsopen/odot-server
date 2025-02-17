@@ -5,6 +5,22 @@ import logger from '../utils/logger'
 
 const prisma = new PrismaClient()
 const userService = {
+
+  /**
+   * 修改密码
+   * @param id
+   * @param newPassword
+   */
+  async modifyPassword(id: string, newPassword: string) {
+    try {
+      const result = await prisma.user.findFirstOrThrow({ where: { id } })
+      const newPasswordHash = generateHashPassword(result.salt + newPassword)
+      await prisma.user.update({ where: { id }, data: { password: newPasswordHash, password_modification_time: new Date() } })
+    }
+    catch (err) {
+      logger.error(err)
+    }
+
   /**
    * 创建用户
    * @param email 用户邮箱地址
@@ -30,6 +46,7 @@ const userService = {
           password: passwordHash,
           creation_time: new Date(),
           nickname: `用户-${generateStr(4)}`,
+          password_modification_time: new Date(),
         },
       })
       return 'registeredSuccessfully'

@@ -8,6 +8,7 @@ import { redisZero } from '../utils/redis'
 
 const prisma = new PrismaClient()
 const authService = {
+
   /**
    * 生成jwt
    * @param email 邮箱地址
@@ -15,7 +16,7 @@ const authService = {
   async generateJwtToken(email: string): Promise<string> {
     try {
       const id = await prisma.user.findUniqueOrThrow({ where: { email }, select: { id: true } })
-      return jwt.sign({ id }, getEnv.JWT_SECRET_KEY, { expiresIn: getEnv.JWT_EXPIRATION_TIME })
+      return jwt.sign(id, getEnv.JWT_SECRET_KEY, { expiresIn: getEnv.JWT_EXPIRATION_TIME })
     }
     catch (err) {
       logger.error(err)
@@ -70,12 +71,26 @@ const authService = {
 
   /**
    * 检查验证码
-   * @param email 邮箱地址
    * @param code 验证码
+   * @param email
+   * @param id
    */
-  async verificationCode(email: string, code: string): Promise<boolean> {
-    const codeValue = await redisZero.get(email)
-    return codeValue === code
+  async verificationCode(code: string, email?: string, id?: string): Promise<boolean> {
+    if (email) {
+      const codeValue = await redisZero.get(email)
+      return codeValue === code
+    }
+    else {
+      try {
+        const result = await prisma.user.findUniqueOrThrow({ where: { id }, select: { email: true } })
+        const codeValue = await redisZero.get(result.email)
+        return codeValue === code
+      }
+      catch (err) {
+        // logger.error(err)
+        return false
+      }
+    }
   },
 }
 

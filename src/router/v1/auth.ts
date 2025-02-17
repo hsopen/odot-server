@@ -5,7 +5,7 @@ import {
   handleValidationErrors,
   passwordValidator,
   rememberToLogInValidator,
-} from './middleware/validator'
+} from './middleware/validatorMiddleware'
 
 const router = express.Router()
 

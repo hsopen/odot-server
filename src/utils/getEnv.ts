@@ -15,7 +15,7 @@ export default {
   REDIS_PORT: env.get('REDIS_PORT').required().asPortNumber(),
   REDIS_USERNAME: env.get('REDIS_USERNAME').required().asString(),
   REDIS_PASSWORD: env.get('REDIS_PASSWORD').required().asString(),
-  REDIS_TLS: env.get('REDID_TLS').required().asJsonObject(),
+  REDIS_TLS: env.get('REDIS_TLS').required().asJsonObject(),
 
   EMAIL_EXPIRATION_TIME: env.get('EMAIL_EXPIRATION_TIME').required().asInt(),
   VERIFICATION_CODE_SENDING_INTERVAL: env.get('VERIFICATION_CODE_SENDING_INTERVAL').required().asInt(),
