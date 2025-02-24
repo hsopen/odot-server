@@ -15,7 +15,7 @@ const userService = {
     try {
       const result = await prisma.user.findFirstOrThrow({ where: { id } })
       const newPasswordHash = generateHashPassword(result.salt + newPassword)
-      await prisma.user.update({ where: { id }, data: { password: newPasswordHash, password_modification_time: new Date() } })
+      await prisma.user.update({ where: { id }, data: { password: newPasswordHash, certification_information_modification_time: new Date() } })
     }
     catch (err) {
       logger.error(err)
@@ -47,7 +47,7 @@ const userService = {
           password: passwordHash,
           creation_time: new Date(),
           nickname: `用户-${generateStr(4)}`,
-          password_modification_time: new Date(),
+          certification_information_modification_time: new Date(),
         },
       })
       return 'registeredSuccessfully'
