@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import getEnv from '../../../utils/getEnv'
 import logger from '../../../utils/logger'
+import prisma from '../../../utils/prisma'
 import { resHandler } from '../../../utils/resHandler'
 
 interface JwtPayload {
@@ -33,7 +33,6 @@ export async function getUserIdFromToken(req: Request, res: Response, next: Next
     const jwtIssueTime = decoded.iat // JWT 签发时间（秒，UTC 时间）
 
     // 查询用户的密码修改时间
-    const prisma = new PrismaClient()
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: decoded.id },
       select: {

@@ -1,12 +1,11 @@
 import { createHash } from 'node:crypto'
-import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
-import { sendVerificationCode } from '../utils/email' // 导入单例邮件服务实例
+import { sendVerificationCode } from '../utils/email'
 import getEnv from '../utils/getEnv'
 import logger from '../utils/logger'
+import prisma from '../utils/prisma'
 import { redisZero } from '../utils/redis'
 
-const prisma = new PrismaClient()
 const authService = {
 
   /**

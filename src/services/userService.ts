@@ -1,9 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto'
-import { PrismaClient } from '@prisma/client'
 import { v7 as uuidv7 } from 'uuid'
 import logger from '../utils/logger'
+import prisma from '../utils/prisma'
 
-const prisma = new PrismaClient()
 const userService = {
 
   /**
