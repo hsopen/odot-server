@@ -20,11 +20,11 @@ model task {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model user {
-  id                         String   @id(map: "user_pk") @db.Uuid
-  email                      String   @unique(map: "user_pk_2") @db.VarChar
-  salt                       String   @db.Char(32)
-  password                   String   @db.Char(64)
-  nickname                   String   @db.VarChar(255)
-  creation_time              DateTime @db.Timestamptz(6)
-  password_modification_time DateTime @db.Timestamptz(6)
+  id                                          String   @id(map: "user_pk") @db.Uuid
+  email                                       String   @unique(map: "user_pk_2") @db.VarChar
+  salt                                        String   @db.Char(32)
+  password                                    String   @db.Char(64)
+  nickname                                    String   @db.VarChar(255)
+  creation_time                               DateTime @db.Timestamptz(6)
+  certification_information_modification_time DateTime @db.Timestamptz(6)
 }
