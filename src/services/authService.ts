@@ -15,8 +15,8 @@ const authService = {
    */
   async generateJwtToken(email: string): Promise<string> {
     try {
-      const id = await prisma.user.findUniqueOrThrow({ where: { email }, select: { id: true } })
-      return jwt.sign(id, getEnv.JWT_SECRET_KEY, { expiresIn: getEnv.JWT_EXPIRATION_TIME })
+      const { id } = await prisma.user.findUniqueOrThrow({ where: { email }, select: { id: true } })
+      return jwt.sign({ id, email }, getEnv.JWT_SECRET_KEY, { expiresIn: getEnv.JWT_EXPIRATION_TIME })
     }
     catch (err) {
       logger.error(err)
