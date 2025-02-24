@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import authService from '../services/authService'
 import userService from '../services/userService'
+import { redisZero } from '../utils/redis'
 import { resHandler } from '../utils/resHandler'
 
 const userController = {
@@ -14,6 +15,7 @@ const userController = {
     const data = req.body
     if (await authService.verificationCode(data.code, undefined, res.locals.userId)) {
       await userService.modifyPassword(res.locals.userId, data.password)
+      redisZero.del(res.locals.email)
       resHandler(res, 200, true, 'modificationWasSuccessful')
       return
     }
@@ -40,6 +42,7 @@ const userController = {
       resHandler(res, 401, false, 'emailHasBeenRegistered')
     }
     else {
+      redisZero.del(data.email)
       resHandler(res, 200, false, 'registeredSuccessfully')
     }
   },
