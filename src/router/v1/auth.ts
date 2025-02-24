@@ -9,6 +9,13 @@ import {
 
 const router = express.Router()
 
+/**
+ * 发送验证码
+ */
 router.post('/sendAnEmailVerificationCode', emailValidator, handleValidationErrors, authController.sendAnEmailVerificationCode)
+
+/**
+ * 用户登录
+ */
 router.post('/login', emailValidator, passwordValidator, rememberToLogInValidator, handleValidationErrors, authController.login)
 export default router
