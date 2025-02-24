@@ -50,7 +50,7 @@ export async function getUserIdFromToken(req: Request, res: Response, next: Next
 
     // 验证通过，将用户 ID 存储在 res.locals 中
     res.locals.userId = decoded.id
-    res.locals.email = decoded.email
+    res.locals.userEmail = decoded.email
 
     next()
   }
