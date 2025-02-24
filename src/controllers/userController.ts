@@ -5,6 +5,26 @@ import { redisZero } from '../utils/redis'
 import { resHandler } from '../utils/resHandler'
 
 const userController = {
+
+  async modifyEmailAddress(req: Request, res: Response, _next: NextFunction) {
+    const data = req.body
+    if (!await authService.verificationCode(data.code, data.email)) {
+      resHandler(res, 401, false, 'verificationCodeError')
+      return
+    }
+    const result = await userService.modifyEmailAddress(res.locals.userId, data.email, res.locals.userEmail)
+    if (result === 'modificationSuccess') {
+      redisZero.del(res.locals.userEmail)
+      resHandler(res, 200, true, 'emailUpdateSuccessful')
+    }
+    else if (result === 'newEmailSameAsOldEmail') {
+      resHandler(res, 409, false, 'newEmailSameAsOldEmail')
+    }
+    else {
+      resHandler(res, 500, false, 'updateFailed')
+    }
+  },
+
   /**
    * 修改密码
    * @param req
@@ -15,7 +35,7 @@ const userController = {
     const data = req.body
     if (await authService.verificationCode(data.code, undefined, res.locals.userId)) {
       await userService.modifyPassword(res.locals.userId, data.password)
-      redisZero.del(res.locals.email)
+      redisZero.del(res.locals.userEmail)
       resHandler(res, 200, true, 'modificationWasSuccessful')
       return
     }

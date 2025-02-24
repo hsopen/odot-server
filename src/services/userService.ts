@@ -6,6 +6,29 @@ import prisma from '../utils/prisma'
 const userService = {
 
   /**
+   * 修改用户的邮箱
+   * @param id 用户id
+   * @param newEmail 新的邮箱地址
+   */
+  async modifyEmailAddress(id: string, newEmail: string, oldEmail: string): Promise<
+    'newEmailSameAsOldEmail' |
+    'modificationSuccess' |
+    'updateFailed'
+  > {
+    try {
+      if (oldEmail === newEmail) {
+        return 'newEmailSameAsOldEmail'
+      }
+      await prisma.user.update({ where: { id }, data: { email: newEmail, certification_information_modification_time: new Date() } })
+      return 'modificationSuccess'
+    }
+    catch (err) {
+      logger.error(err)
+      return 'modificationSuccess'
+    }
+  },
+
+  /**
    * 修改密码
    * @param id
    * @param newPassword
