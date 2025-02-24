@@ -43,7 +43,7 @@ const userController = {
     }
     else {
       redisZero.del(data.email)
-      resHandler(res, 200, false, 'registeredSuccessfully')
+      resHandler(res, 200, true, 'registeredSuccessfully')
     }
   },
 }
