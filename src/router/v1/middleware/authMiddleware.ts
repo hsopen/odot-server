@@ -3,8 +3,10 @@ import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import getEnv from '../../../utils/getEnv'
 import logger from '../../../utils/logger'
+import { resHandler } from '../../../utils/resHandler'
 
 interface JwtPayload {
+  email: string
   id: string
   iat: number
 }
@@ -20,8 +22,7 @@ export async function getUserIdFromToken(req: Request, res: Response, next: Next
     const token = tokenCookie?.split('=')[1]
     if (!token) {
       logger.warn('No token found in cookies')
-      res.status(401).json({ message: '未提供 token，请先登录' })
-      return
+      return resHandler(res, 401, false, '未提供 token，请先登录')
     }
 
     // 验证 token
@@ -36,33 +37,21 @@ export async function getUserIdFromToken(req: Request, res: Response, next: Next
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: decoded.id },
       select: {
-        password_modification_time: true,
+        certification_information_modification_time: true,
       },
     })
 
-    // 如果用户没有密码修改时间，直接通过
-    if (!user.password_modification_time) {
-      res.locals.userId = decoded.id
-      logger.info(`Authenticated user: ${decoded.id}`)
-      next()
-      return
-    }
-
     // 将密码修改时间转换为 Unix 时间戳（秒，UTC 时间）
-    const passwordModificationTime = Math.floor(user.password_modification_time.getTime() / 1000)
+    const passwordModificationTime = Math.floor(user.certification_information_modification_time.getTime() / 1000)
     // 对比 JWT 签发时间和密码修改时间
     if (jwtIssueTime < passwordModificationTime) {
       logger.warn(`Token issued before password modification for user: ${decoded.id}`)
-      res.status(401).json({
-        message: 'token 无效，请重新登录',
-        code: 'TOKEN_INVALID_AFTER_PASSWORD_CHANGE',
-      })
-      return
+      return resHandler(res, 401, false, 'tokenIsInvalidPleaseLogInAgain')
     }
 
     // 验证通过，将用户 ID 存储在 res.locals 中
     res.locals.userId = decoded.id
-    logger.info(`Authenticated user: ${decoded.id}`)
+    res.locals.email = decoded.email
 
     next()
   }
@@ -70,24 +59,13 @@ export async function getUserIdFromToken(req: Request, res: Response, next: Next
     logger.error('JWT verification failed:', error)
 
     if (error instanceof jwt.TokenExpiredError) {
-      res.status(401).json({
-        message: 'token 已过期',
-        code: 'TOKEN_EXPIRED',
-      })
-      return
+      return resHandler(res, 401, false, 'tokenHasExpired')
     }
 
     if (error instanceof jwt.JsonWebTokenError) {
-      res.status(401).json({
-        message: '无效的 token',
-        code: 'INVALID_TOKEN',
-      })
-      return
+      return resHandler(res, 401, false, 'invalidToken')
     }
 
-    res.status(500).json({
-      message: '服务器验证 token 失败',
-      code: 'SERVER_ERROR',
-    })
+    return resHandler(res, 500, false, 'serverVerificationTokenFailed')
   }
 }
