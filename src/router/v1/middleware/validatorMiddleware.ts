@@ -1,18 +1,28 @@
 import type { NextFunction, Request, Response } from 'express'
 import { body, validationResult } from 'express-validator'
 
+// 昵称规则验证
+export const nickname = [
+  body('nickname')
+    .isLength({ min: 2, max: 16 })
+    .withMessage('usernameShouldBe_2To_16Characters'),
+]
+
+// 邮箱规则验证
 export const emailValidator = [
   body('email')
     .isEmail()
     .withMessage('please provide a valid email address'),
 ]
 
+// 密码规则验证
 export const passwordValidator = [
   body('password')
     .isLength({ min: 6, max: 32 })
     .withMessage('please provide a valid password'),
 ]
 
+// 记忆规则验证
 export const rememberToLogInValidator = [
   body('remember')
     .isBoolean()

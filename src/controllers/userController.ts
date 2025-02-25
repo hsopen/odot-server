@@ -6,6 +6,27 @@ import { resHandler } from '../utils/resHandler'
 
 const userController = {
 
+  /**
+   * 修改用户昵称
+   * @param req
+   * @param res
+   * @param _next
+   */
+  async modifyNickname(req: Request, res: Response, _next: NextFunction) {
+    const data = req.body
+    if (await userService.modifyNickname(res.locals.userId, data.nickname)) {
+      resHandler(res, 200, true, 'nicknameUpdateSuccess')
+      return
+    }
+    resHandler(res, 500, false, 'nicknameUpdateFailed')
+  },
+
+  /**
+   * 修改用户邮箱地址
+   * @param req
+   * @param res
+   * @param _next
+   */
   async modifyEmailAddress(req: Request, res: Response, _next: NextFunction) {
     const data = req.body
     if (!await authService.verificationCode(data.code, data.email)) {

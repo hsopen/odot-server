@@ -5,6 +5,17 @@ import prisma from '../utils/prisma'
 
 const userService = {
 
+  async modifyNickname(id: string, nickname: string): Promise<boolean> {
+    try {
+      await prisma.user.update({ where: { id }, data: { nickname } })
+      return true
+    }
+    catch (err) {
+      logger.error(err)
+      return false
+    }
+  },
+
   /**
    * 修改用户的邮箱
    * @param id 用户id
