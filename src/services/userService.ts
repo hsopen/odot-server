@@ -5,6 +5,12 @@ import prisma from '../utils/prisma'
 
 const userService = {
 
+  /**
+   * 删除用户信息
+   * @param id 用户id
+   * @param password 用户密码
+   * @returns 成功or失败
+   */
   async deactivateUser(id: string, password: string) {
     try {
       const result = await prisma.user.findFirstOrThrow({ where: { id }, select: { salt: true, password: true } })
