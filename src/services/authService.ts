@@ -1,12 +1,36 @@
 import { createHash } from 'node:crypto'
+import { Prisma } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import { sendVerificationCode } from '../utils/email'
 import getEnv from '../utils/getEnv'
 import logger from '../utils/logger'
 import prisma from '../utils/prisma'
 import { redisZero } from '../utils/redis'
+import { generateHashPassword } from './userService'
 
 const authService = {
+
+  /**
+   * 忘记密码后修改密码
+   * @param email 用户邮箱
+   * @param password 用户新密码
+   * @returns 成功or失败
+   */
+  async changePasswordAfterForgot(email: string, password: string) {
+    try {
+      const result = await prisma.user.findUnique({ where: { email }, select: { salt: true } })
+      if (result) {
+        const passwordHash = generateHashPassword(result.salt + password)
+        await prisma.user.update({ where: { email }, data: { password: passwordHash, certification_information_modification_time: new Date() } })
+        return 'modificationSucceeded'
+      }
+      return 'noSuchUser'
+    }
+    catch (err) {
+      logger.error(err)
+      return 'queryError'
+    }
+  },
 
   /**
    * 生成jwt

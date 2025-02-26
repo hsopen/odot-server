@@ -8,6 +8,31 @@ import { resHandler } from '../utils/resHandler'
 const authController = {
 
   /**
+   * 修改密码
+   * @param req
+   * @param res
+   * @param _next
+   */
+  async forgotPassword(req: Request, res: Response, _next: NextFunction) {
+    if (!await authService.verificationCode(req.body.code, req.body.email)) {
+      resHandler(res, 401, false, 'incorrectVerificationCode')
+    }
+    else {
+      const result = await authService.changePasswordAfterForgot(req.body.email, req.body.password)
+      if (result === 'noSuchUser') {
+        resHandler(res, 401, true, 'noSuchUser')
+        return
+      }
+      else if (result === 'queryError') {
+        resHandler(res, 500, false, 'updateFailed')
+        return
+      }
+      redisZero.del(req.body.email)
+      resHandler(res, 200, true, 'modificationSuccessful')
+    }
+  },
+
+  /**
    * 登录认证控制器
    * @param req
    * @param res
@@ -47,7 +72,7 @@ const authController = {
       }
       const code = await authService.sendVerificationCode(data.email)
       await redisZero.set(data.email, code, 'EX', getEnv.EMAIL_EXPIRATION_TIME)
-      await redisOne.set(data.email, 1, 'EX', getEnv.EMAIL_EXPIRATION_TIME)
+      await redisOne.set(data.email, 1, 'EX', getEnv.VERIFICATION_CODE_SENDING_INTERVAL)
       resHandler(res, 200, true, 'email verification code was sent successfully')
     }
     catch (error) {

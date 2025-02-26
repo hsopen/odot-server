@@ -10,6 +10,11 @@ import {
 const router = express.Router()
 
 /**
+ * 忘记密码
+ */
+router.post('/forgotPassword', emailValidator, passwordValidator, handleValidationErrors, authController.forgotPassword)
+
+/**
  * 发送验证码
  */
 router.post('/sendAnEmailVerificationCode', emailValidator, handleValidationErrors, authController.sendAnEmailVerificationCode)

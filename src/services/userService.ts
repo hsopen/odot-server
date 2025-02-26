@@ -133,7 +133,7 @@ function generateStr(length: number): string {
  * 获取密码hash
  * @param str
  */
-function generateHashPassword(str: string): string {
+export function generateHashPassword(str: string): string {
   return createHash('sha256').update(str).digest('hex')
 }
 
