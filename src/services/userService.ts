@@ -5,6 +5,28 @@ import prisma from '../utils/prisma'
 
 const userService = {
 
+  async deactivateUser(id: string, password: string) {
+    try {
+      const result = await prisma.user.findFirstOrThrow({ where: { id }, select: { salt: true, password: true } })
+      password = generateHashPassword(result.salt + password)
+      if (result.password === password) {
+        await prisma.user.delete({ where: { id } })
+        return true
+      }
+      return false
+    }
+    catch (err) {
+      logger.error(err)
+      return false
+    }
+  },
+
+  /**
+   * 修改用户昵称
+   * @param id 用户id
+   * @param nickname 新用户昵称
+   * @returns 是否修改成功
+   */
   async modifyNickname(id: string, nickname: string): Promise<boolean> {
     try {
       await prisma.user.update({ where: { id }, data: { nickname } })

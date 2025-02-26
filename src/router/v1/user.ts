@@ -6,6 +6,11 @@ import { emailValidator, handleValidationErrors, nickname as nicknameValidator, 
 const router = express.Router()
 
 /**
+ * 注销用户
+ */
+router.delete('/deactivateUser', getUserIdFromToken, passwordValidator, handleValidationErrors, userController.deactivateUser)
+
+/**
  * 修改用户昵称api
  */
 router.put('/modifyNickname', getUserIdFromToken, nicknameValidator, handleValidationErrors, userController.modifyNickname)

@@ -6,6 +6,18 @@ import { resHandler } from '../utils/resHandler'
 
 const userController = {
 
+  async deactivateUser(req: Request, res: Response, _next: NextFunction) {
+    if (await authService.verificationCode(req.body.code, res.locals.userEmail)) {
+      if (await userService.deactivateUser(res.locals.userId, req.body.password)) {
+        resHandler(res, 200, true, 'accountDeletionSuccess')
+        return
+      }
+      resHandler(res, 401, false, 'passwordError')
+      return
+    }
+    resHandler(res, 401, false, 'verificationCodeError')
+  },
+
   /**
    * 修改用户昵称
    * @param req
