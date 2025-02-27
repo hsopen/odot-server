@@ -1,12 +1,28 @@
 {
   "name": "odot-server",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.3.1",
+    "ali-oss": "^6.22.0",
+    "dotenv": "^16.4.7",
+    "env-var": "^7.5.0",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "ioredis": "^5.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "1.4.5-lts.1",
+    "nodemailer": "^6.10.0",
+    "sharp": "^0.33.5",
+    "uuid": "^11.0.5",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.1.1",
@@ -22,19 +38,12 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },
-  "private": true,
-  "dependencies": {
-    "@prisma/client": "^6.3.1",
-    "ali-oss": "^6.22.0",
-    "dotenv": "^16.4.7",
-    "env-var": "^7.5.0",
-    "express": "^4.21.2",
-    "express-validator": "^7.2.1",
-    "ioredis": "^5.5.0",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "1.4.5-lts.1",
-    "nodemailer": "^6.10.0",
-    "uuid": "^11.0.5",
-    "winston": "^3.17.0"
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "sharp"
+    ],
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
   }
 }
