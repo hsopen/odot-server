@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer'
+import sharp from 'sharp'
 import client from '../utils/aliOSS'
 
 const s3Service = {
@@ -12,7 +13,7 @@ const s3Service = {
   async uploadAvatar(filePath: string, file: Buffer | string): Promise<any> {
     try {
       // 检查文件大小
-      if (file instanceof Buffer && file.length > (5 * 1024 * 1024)) {
+      if (file instanceof Buffer && file.length > 5 * 1024 * 1024) {
         throw new Error('File size exceeds the 5MB limit')
       }
 
@@ -28,6 +29,20 @@ const s3Service = {
         const fileHeader = file.slice(0, 4).toString('hex')
         if (fileHeader !== '52494646') { // 'RIFF' 对应的十六进制值
           throw new Error('File must be of type webp')
+        }
+
+        // 使用 sharp 获取图片的宽度和高度
+        const image = sharp(file)
+        const metadata = await image.metadata()
+
+        // 检查图像尺寸是否超过限制
+        if (metadata.width && metadata.height) {
+          if (metadata.width !== metadata.height) {
+            throw new Error(`Image dimensions exceed the limit: ${800}x${800}`)
+          }
+        }
+        else {
+          throw new Error('Unable to read image dimensions')
         }
       }
 

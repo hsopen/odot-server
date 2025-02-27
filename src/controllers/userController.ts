@@ -22,7 +22,6 @@ const userController = {
     // 使用 multer 中间件处理上传的文件
     upload.single('avatar')(req, res, async (err) => {
       if (err) {
-        console.error('Error processing file upload:', err)
         return resHandler(res, 400, false, 'Error uploading file')
       }
 
