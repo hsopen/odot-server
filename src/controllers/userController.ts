@@ -38,7 +38,7 @@ const userController = {
         const avatarPath: string = `${res.locals.userId}/config/avatar.webp`
 
         // 上传文件到 OSS
-        const result = await s3Service.uploadFile(avatarPath, fileBuffer)
+        const result = await s3Service.uploadAvatar(avatarPath, fileBuffer)
 
         // 返回成功响应
         return resHandler(res, 200, true, 'Avatar uploaded successfully', result)

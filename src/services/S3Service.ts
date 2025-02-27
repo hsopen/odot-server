@@ -2,14 +2,20 @@ import { Buffer } from 'node:buffer'
 import client from '../utils/aliOSS'
 
 const s3Service = {
+
   /**
    * 直接上传文件
    * @param filePath 文件路径
    * @param file 文件数据
    * @returns 上传的结果
    */
-  async uploadFile(filePath: string, file: Buffer | string): Promise<any> {
+  async uploadAvatar(filePath: string, file: Buffer | string): Promise<any> {
     try {
+      // 检查文件大小
+      if (file instanceof Buffer && file.length > (5 * 1024 * 1024)) {
+        throw new Error('File size exceeds the 5MB limit')
+      }
+
       // 检查文件类型是否为 webp
       if (typeof file === 'string') {
         const fileExtension = file.split('.').pop()?.toLowerCase()
@@ -18,10 +24,9 @@ const s3Service = {
         }
       }
       else if (file instanceof Buffer) {
-        // 处理 Buffer 类型的文件
-        // 如果是 Buffer 类型的文件，无法直接检查扩展名，建议通过文件头（magic bytes）来验证
+        // 如果是 Buffer 类型的文件，检查文件头（magic bytes）
         const fileHeader = file.slice(0, 4).toString('hex')
-        if (fileHeader !== '52494646') {
+        if (fileHeader !== '52494646') { // 'RIFF' 对应的十六进制值
           throw new Error('File must be of type webp')
         }
       }
