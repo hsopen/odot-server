@@ -1,10 +1,54 @@
 import type { NextFunction, Request, Response } from 'express'
+import multer from 'multer'
 import authService from '../services/authService'
+import s3Service from '../services/S3Service'
 import userService from '../services/userService'
 import { redisZero } from '../utils/redis'
 import { resHandler } from '../utils/resHandler'
 
 const userController = {
+
+  /**
+   * 上传头像
+   * @param req
+   * @param res
+   * @param _next
+   */
+  async uploadAvatar(req: Request, res: Response, _next: NextFunction) {
+    // 使用 multer 配置来处理文件上传
+    const storage = multer.memoryStorage() // 使用内存存储，不保存到磁盘
+    const upload = multer({ storage }) // 配置上传方式
+
+    // 使用 multer 中间件处理上传的文件
+    upload.single('avatar')(req, res, async (err) => {
+      if (err) {
+        console.error('Error processing file upload:', err)
+        return resHandler(res, 400, false, 'Error uploading file')
+      }
+
+      // 获取上传的文件数据
+      const fileBuffer = req.file?.buffer
+
+      if (!fileBuffer) {
+        return resHandler(res, 400, false, 'No file uploaded')
+      }
+
+      try {
+        // 获取当前用户的头像路径
+        const avatarPath: string = `${res.locals.userId}/config/avatar.webp`
+
+        // 上传文件到 OSS
+        const result = await s3Service.uploadFile(avatarPath, fileBuffer)
+
+        // 返回成功响应
+        return resHandler(res, 200, true, 'Avatar uploaded successfully', result)
+      }
+      catch (error) {
+        console.error('Error uploading avatar:', error)
+        return resHandler(res, 500, false, 'Error uploading avatar')
+      }
+    })
+  },
 
   /**
    * 注销用户控制器

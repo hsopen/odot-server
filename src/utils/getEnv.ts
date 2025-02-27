@@ -25,4 +25,9 @@ export default {
   COOKIE_HTTP_ONLY: env.get('COOKIE_HTTP_ONLY').required().asBoolStrict(),
   COOKIE_SECURE: env.get('COOKIE_SECURE').required().asBoolStrict(),
   COOKIE_SAME_SITE: env.get('COOKIE_SAME_SITE').required().asEnum(['strict', 'lax', 'none']),
+
+  S3_ID: env.get('S3_ID').required().asString(),
+  S3_SECRET: env.get('S3_SECRET').required().asString(),
+  S3_REGION: env.get('S3_REGION').required().asString(),
+  S3_BUCKET: env.get('S3_BUCKET').required().asString(),
 }

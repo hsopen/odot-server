@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto'
-import { Prisma } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import { sendVerificationCode } from '../utils/email'
 import getEnv from '../utils/getEnv'

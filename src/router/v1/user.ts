@@ -6,7 +6,12 @@ import { emailValidator, handleValidationErrors, nickname as nicknameValidator, 
 const router = express.Router()
 
 /**
- * 注销用户
+ * 上传头像api
+ */
+router.put('/uploadAvatar', getUserIdFromToken, userController.uploadAvatar)
+
+/**
+ * 注销用户api
  */
 router.delete('/deactivateUser', getUserIdFromToken, passwordValidator, handleValidationErrors, userController.deactivateUser)
 
