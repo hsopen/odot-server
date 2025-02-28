@@ -6,6 +6,16 @@ import { emailValidator, handleValidationErrors, nickname as nicknameValidator, 
 const router = express.Router()
 
 /**
+ * 获取用户昵称
+ */
+router.get('/getNickname', getUserIdFromToken, userController.getNickname)
+
+/**
+ * 获取用户邮箱
+ */
+router.get('/getUserEmail', getUserIdFromToken, userController.getUserEmail)
+
+/**
  * 获取头像
  */
 router.get('/getAvatar', getUserIdFromToken, userController.getAvatarPresignedUrl)

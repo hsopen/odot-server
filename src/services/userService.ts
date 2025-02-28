@@ -9,6 +9,35 @@ import s3Service from './S3Service'
 const userService = {
 
   /**
+   * 获取用户邮箱地址
+   * @param id 用户id
+   */
+  async getUserEmail(id: string): Promise<string | null> {
+    try {
+      const result = await prisma.user.findUniqueOrThrow({ where: { id }, select: { email: true } })
+      return result.email
+    }
+    catch (err) {
+      logger.error(err)
+      return null
+    }
+  },
+
+  /**
+   * 获取用户昵称
+   * @param id 用户id
+   */
+  async getUserNickname(id: string): Promise<string | null> {
+    try {
+      const result = await prisma.user.findUniqueOrThrow({ where: { id }, select: { nickname: true } })
+      return result.nickname
+    }
+    catch (err) {
+      logger.error(err)
+      return null
+    }
+  },
+  /**
    * 用户登录
    * @param id 用户id
    * @returns 预签名链接或null
