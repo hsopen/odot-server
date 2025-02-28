@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon"
+    "dev": "ts-node src/index.ts",
+    "nodemon-dev": "nodemon"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",
