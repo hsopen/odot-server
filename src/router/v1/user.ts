@@ -6,6 +6,11 @@ import { emailValidator, handleValidationErrors, nickname as nicknameValidator, 
 const router = express.Router()
 
 /**
+ * 获取头像
+ */
+router.get('/getAvatar', getUserIdFromToken, userController.getAvatarPresignedUrl)
+
+/**
  * 上传头像api
  */
 router.put('/uploadAvatar', getUserIdFromToken, userController.uploadAvatar)

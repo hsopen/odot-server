@@ -1,9 +1,56 @@
+import type { Buffer } from 'node:buffer'
 import { createHash, randomBytes } from 'node:crypto'
+import sharp from 'sharp'
 import { v7 as uuidv7 } from 'uuid'
 import logger from '../utils/logger'
 import prisma from '../utils/prisma'
+import s3Service from './S3Service'
 
 const userService = {
+
+  /**
+   * 用户登录
+   * @param id 用户id
+   * @returns 预签名链接或null
+   */
+  async getUserAvatarPresignedUrl(id: string): Promise<string | null> {
+    const filePath: string = `${id}/config/avatar.webp`
+    const resutl: string | null = await s3Service.getFileSignature(filePath, 108000)
+    return resutl
+  },
+
+  /**
+   * 上传用户头像
+   * @param id 用户id
+   * @param fileBuffer 头像文件
+   * @returns 返回上传结果
+   */
+  async uploadUserAvatar(id: string, fileBuffer: Buffer): Promise<
+    'fileTypeMismatch' |
+    'imageSizeDoesNotMeetDimensions' |
+    'uploadSuccess' |
+    'imageUploadFailed'
+  > {
+    const filePath: string = `${id}/config/avatar.webp`
+    const image = sharp(fileBuffer)
+    const metadata = await image.metadata()
+    if (!(metadata.format === 'webp')) {
+      return 'fileTypeMismatch'
+    }
+    if (metadata.width && metadata.height) {
+      if (!(metadata.width === metadata.height)) {
+        return 'imageSizeDoesNotMeetDimensions'
+      }
+    }
+    else {
+      return 'imageUploadFailed'
+    }
+    const result = await s3Service.uploadFile(filePath, fileBuffer, 5242880)
+    if (!result) {
+      return 'imageUploadFailed'
+    }
+    return 'uploadSuccess'
+  },
 
   /**
    * 删除用户信息
