@@ -5,17 +5,16 @@ import userService from '../services/userService'
 import logger from '../utils/logger'
 import { redisZero } from '../utils/redis'
 import { resHandler } from '../utils/resHandler'
-import { nickname } from '../router/v1/middleware/validatorMiddleware'
 
 const userController = {
 
   /**
    * 获取用户邮箱控制器
-   * @param req 
-   * @param res 
-   * @param _next 
+   * @param req
+   * @param res
+   * @param _next
    */
-  async getUserEmail(req:Request,res:Response,_next:NextFunction){
+  async getUserEmail(req: Request, res: Response, _next: NextFunction) {
     const result = await userService.getUserEmail(res.locals.userId)
     if (!result) {
       resHandler(res, 500, true, 'failedToGetUserEmail')
@@ -25,9 +24,9 @@ const userController = {
 
   /**
    * 获取用户昵称控制器
-   * @param req 
-   * @param res 
-   * @param _next 
+   * @param req
+   * @param res
+   * @param _next
    */
   async getNickname(req: Request, res: Response, _next: NextFunction) {
     const result = await userService.getUserNickname(res.locals.userId)
@@ -35,7 +34,6 @@ const userController = {
       resHandler(res, 500, true, 'failedToGetUserNickname')
     }
     resHandler(res, 200, true, 'getUsernameSuccess', { nickname: result })
-
   },
 
   /**

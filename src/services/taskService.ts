@@ -3,6 +3,31 @@ import logger from '../utils/logger'
 import prisma from '../utils/prisma'
 
 const taskService = {
+
+  /**
+   * 修改任务
+   * @param userId 用户id
+   * @param taskId 任务id
+   * @param title 标题
+   * @param priority 优先级
+   * @param remark 备注
+   * @returns 
+   */
+  async modifyTask(userId: string, taskId: string, title: string, priority: -2 | -1 | 0 | 1 | 2 = 0, remark: string) {
+    try {
+      const result = await prisma.task.findUnique({ where: { id: taskId,}, select: {own_user_id:true} })
+      if (result && result.own_user_id !== userId) {
+        return 'noSuchTask'
+      }
+      const data = await prisma.task.update({ where: { id: taskId }, data: { title, priority, remark } })
+      return data
+    }
+    catch (err) {
+      logger.error(err)
+      return 'modificationFailed'
+    }
+  },
+
   /**
    * 创建任务
    * @param userId 用户id
@@ -15,7 +40,7 @@ const taskService = {
     userId: string,
     title: string,
     priority: -2 | -1 | 0 | 1 | 2 = 0,
-    remark?: string,
+    remark: string,
   ): Promise<boolean> {
     try {
       const id = uuidv7()
