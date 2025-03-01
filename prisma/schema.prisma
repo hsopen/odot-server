@@ -18,6 +18,7 @@ model task {
   priority         Int      @default(0) @db.SmallInt
   creation_time    DateTime @db.Timestamptz(6)
   update_time      DateTime @db.Timestamptz(6)
+  tag              String[] @db.VarChar
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
