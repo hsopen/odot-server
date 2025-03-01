@@ -5,6 +5,21 @@ import { resHandler } from '../utils/resHandler'
 const taskController = {
 
   /**
+   * 获取所有任务
+   * @param req 
+   * @param res 
+   * @param _next 
+   */
+  async getAllTasks(req: Request, res: Response, _next: NextFunction){
+    const result = await taskService.getAllTasks(res.locals.userId)
+    if(result === 'queryFailed'){
+      resHandler(res,500,false,'fetchFailure')
+    }else[
+      resHandler(res,200,true,'获取成功',result)
+    ]
+  },
+
+  /**
    * 修改任务控制器
    * @param req 
    * @param res 

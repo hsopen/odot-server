@@ -4,6 +4,22 @@ import prisma from '../utils/prisma'
 
 const taskService = {
 
+
+  /**
+   * 获取用户所有任务
+   * @param userId 用户id
+   * @returns 
+   */
+  async getAllTasks(userId:string){
+    try{
+      const result  = await prisma.task.findMany({where:{own_user_id:userId}})
+      return result
+    }catch(err){
+      logger.error(err)
+      return 'queryFailed'
+    }
+  },
+
   /**
    * 修改任务
    * @param userId 用户id
