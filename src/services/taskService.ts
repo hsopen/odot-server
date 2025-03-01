@@ -10,11 +10,11 @@ const taskService = {
    * @param userId 用户id
    * @returns 
    */
-  async getAllTasks(userId:string){
-    try{
-      const result  = await prisma.task.findMany({where:{own_user_id:userId}})
+  async getAllTasks(userId: string) {
+    try {
+      const result = await prisma.task.findMany({ where: { own_user_id: userId } })
       return result
-    }catch(err){
+    } catch (err) {
       logger.error(err)
       return 'queryFailed'
     }
@@ -27,15 +27,16 @@ const taskService = {
    * @param title 标题
    * @param priority 优先级
    * @param remark 备注
+   * @param tag 任务标签
    * @returns 
    */
-  async modifyTask(userId: string, taskId: string, title: string, priority: -2 | -1 | 0 | 1 | 2 = 0, remark: string) {
+  async modifyTask(userId: string, taskId: string, title: string, priority: -2 | -1 | 0 | 1 | 2 = 0, remark: string, tag: string[]) {
     try {
-      const result = await prisma.task.findUnique({ where: { id: taskId,}, select: {own_user_id:true} })
+      const result = await prisma.task.findUnique({ where: { id: taskId, }, select: { own_user_id: true } })
       if (result && result.own_user_id !== userId) {
         return 'noSuchTask'
       }
-      const data = await prisma.task.update({ where: { id: taskId }, data: { title, priority, remark } })
+      const data = await prisma.task.update({ where: { id: taskId }, data: { title, priority, remark, tag ,update_time:new Date()} })
       return data
     }
     catch (err) {

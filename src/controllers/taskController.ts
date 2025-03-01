@@ -32,6 +32,7 @@ const taskController = {
       req.body.title,
       req.body.priority,
       req.body.remark,
+      req.body.tag
     )
     if (result === 'modificationFailed') {
       resHandler(res, 500, false, 'modificationFailed')
