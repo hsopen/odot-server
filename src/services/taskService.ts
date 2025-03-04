@@ -4,17 +4,41 @@ import prisma from '../utils/prisma'
 
 const taskService = {
 
+  /**
+   * 修改任务完成状态
+   * @param userId 用户id
+   * @param taskId 任务id
+   * @param status 状态
+   */
+  async updateTaskStatus(userId: string, taskId: string, status: boolean): Promise<boolean> {
+    try {
+      await prisma.task.update({
+        where: {
+          id: taskId,
+          own_user_id: userId,
+        },
+        data: {
+          status,
+        },
+      })
+      return true
+    }
+    catch (err) {
+      logger.error(err)
+      return false
+    }
+  },
 
   /**
    * 获取用户所有任务
    * @param userId 用户id
-   * @returns 
    */
   async getAllTasks(userId: string) {
     try {
       const result = await prisma.task.findMany({ where: { own_user_id: userId } })
       return result
-    } catch (err) {
+    }
+    catch (err) {
       logger.error(err)
       return 'queryFailed'
     }
@@ -28,15 +52,14 @@ const taskService = {
    * @param priority 优先级
    * @param remark 备注
    * @param tag 任务标签
-   * @returns 
    */
   async modifyTask(userId: string, taskId: string, title: string, priority: -2 | -1 | 0 | 1 | 2 = 0, remark: string, tag: string[]) {
     try {
-      const result = await prisma.task.findUnique({ where: { id: taskId, }, select: { own_user_id: true } })
+      const result = await prisma.task.findUnique({ where: { id: taskId }, select: { own_user_id: true } })
       if (result && result.own_user_id !== userId) {
         return 'noSuchTask'
       }
-      const data = await prisma.task.update({ where: { id: taskId }, data: { title, priority, remark, tag ,update_time:new Date()} })
+      const data = await prisma.task.update({ where: { id: taskId }, data: { title, priority, remark, tag, update_time: new Date() } })
       return data
     }
     catch (err) {

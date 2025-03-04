@@ -9,16 +9,17 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model task {
-  id               String   @id(map: "id") @db.Uuid
-  own_user_id      String   @db.Uuid
-  title            String   @db.VarChar(255)
-  remark           String?
-  status           Boolean  @default(false)
-  attachments_path Json?
-  priority         Int      @default(0) @db.SmallInt
-  creation_time    DateTime @db.Timestamptz(6)
-  update_time      DateTime @db.Timestamptz(6)
-  tag              String[] @db.VarChar
+  id                  String    @id(map: "id") @db.Uuid
+  own_user_id         String    @db.Uuid
+  title               String    @db.VarChar(255)
+  remark              String?
+  status              Boolean   @default(false)
+  attachments_path    Json?
+  priority            Int       @default(0) @db.SmallInt
+  creation_time       DateTime  @db.Timestamptz(6)
+  update_time         DateTime  @db.Timestamptz(6)
+  tag                 String[]  @db.VarChar
+  scheduled_task_time DateTime? @db.Timestamptz(6)
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
