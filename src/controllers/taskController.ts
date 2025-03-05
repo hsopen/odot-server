@@ -5,6 +5,22 @@ import { resHandler } from '../utils/resHandler'
 const taskController = {
 
   /**
+   * 获取今日的预定任务
+   * @param req
+   * @param res
+   * @param _next
+   */
+  async getTodayTasks(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const { todayCompleted, todayIncomplete } = await taskService.getTodayTasks(res.locals.userId, req.query.timeZone as string)
+      resHandler(res, 200, true, 'successFetched', { todayCompleted, todayIncomplete })
+    }
+    catch {
+      resHandler(res, 500, false, 'failedToRetrieve')
+    }
+  },
+
+  /**
    * 修改任务完成状态
    * @param req
    * @param res

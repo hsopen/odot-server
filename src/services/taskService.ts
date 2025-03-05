@@ -1,8 +1,50 @@
+import { endOfDay, startOfDay } from 'date-fns'
+import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 import { v7 as uuidv7 } from 'uuid'
 import logger from '../utils/logger'
 import prisma from '../utils/prisma'
 
 const taskService = {
+
+  async getTodayTasks(userId: string, timeZone: string) {
+    // 获取当前时间
+    const now = new Date()
+
+    // 将当前时间转换为传入时区的时间
+    const zonedNow = toZonedTime(now, timeZone)
+
+    // 获取传入时区的当天开始和结束时间
+    const startOfDayZoned = startOfDay(zonedNow)
+    const endOfDayZoned = endOfDay(zonedNow)
+
+    // 将时区时间转换为 UTC 时间，以便与数据库中的 timestamptz 字段比较
+    const startOfDayUTC = fromZonedTime(startOfDayZoned, timeZone)
+    const endOfDayUTC = fromZonedTime(endOfDayZoned, timeZone)
+
+    // 查询当天的记录
+    const todayCompleted = await prisma.task.findMany({
+      where: {
+        own_user_id: userId,
+        status: true,
+        scheduled_task_time: {
+          gte: startOfDayUTC.toISOString(),
+          lte: endOfDayUTC.toISOString(),
+        },
+      },
+    })
+
+    const todayIncomplete = await prisma.task.findMany({
+      where: {
+        own_user_id: userId,
+        status: false,
+        scheduled_task_time: {
+          gte: startOfDayUTC.toISOString(),
+          lte: endOfDayUTC.toISOString(),
+        },
+      },
+    })
+    return { todayCompleted, todayIncomplete }
+  },
 
   /**
    * 修改任务完成状态
@@ -35,7 +77,11 @@ const taskService = {
    */
   async getAllTasks(userId: string) {
     try {
-      const result = await prisma.task.findMany({ where: { own_user_id: userId } })
+      const result = await prisma.task.findMany({
+        where: {
+          own_user_id: userId,
+        },
+      })
       return result
     }
     catch (err) {

@@ -5,6 +5,11 @@ import { getUserIdFromToken } from './middleware/authMiddleware'
 const router = express.Router()
 
 /**
+ * 获取今日任务
+ */
+router.get('/getTodayTasks', getUserIdFromToken, taskController.getTodayTasks)
+
+/**
  * 修改任务完成状态
  */
 router.post('/updateTaskStatus', getUserIdFromToken, taskController.updateTaskStatus)
