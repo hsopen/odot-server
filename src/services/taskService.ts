@@ -1,11 +1,72 @@
+import type { Buffer } from 'node:buffer'
+import crypto from 'node:crypto'
 import { endOfDay, startOfDay } from 'date-fns'
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 import { v7 as uuidv7 } from 'uuid'
 import logger from '../utils/logger'
 import prisma from '../utils/prisma'
+import s3Service from './S3Service'
 
 const taskService = {
 
+  async uploadAttachment(userId: string, taskId: string, fileBuffer: Buffer, originalFileName: string) {
+    try {
+      // 计算文件 MD5 值
+      const md5 = crypto.createHash('md5').update(fileBuffer).digest('hex')
+
+      // 生成文件路径
+      const fileName = originalFileName || 'unknown_file'
+      const path = `${userId}/tasks/${taskId}/${md5}_${fileName}`
+
+      // 上传到 S3
+      await s3Service.uploadFile(path, fileBuffer, 5 * 1024 * 1024)
+
+      const newAttachment = {
+        attachmentsName: fileName,
+        attachments_path: path,
+      }
+
+      // 获取当前 attachments_path
+      const task = await prisma.task.findUnique({
+        where: { id: taskId, own_user_id: userId },
+        select: { attachments_path: true },
+      })
+
+      let updatedAttachments = []
+
+      // 如果 task 存在且 attachments_path 为空或者不是数组
+      if (task?.attachments_path) {
+        if (Array.isArray(task.attachments_path)) {
+          // 处理 attachments_path 是数组的情况
+          updatedAttachments = [...task.attachments_path, newAttachment]
+        }
+        else {
+          // 处理 attachments_path 非数组的情况，初始化为数组并添加附件
+          updatedAttachments = [newAttachment]
+        }
+      }
+      else {
+        // 如果 attachments_path 为 null 或 undefined，初始化为空数组并添加附件
+        updatedAttachments = [newAttachment]
+      }
+
+      // 更新数据库
+      await prisma.task.update({
+        where: { id: taskId, own_user_id: userId },
+        data: {
+          attachments_path: updatedAttachments,
+        },
+      })
+
+      return true
+    }
+    catch (error) {
+      console.error('Error updating attachments:', error)
+      return false
+    }
+  },
+
+  // 获取当天的任务
   async getTodayTasks(userId: string, timeZone: string) {
     // 获取当前时间
     const now = new Date()
@@ -116,13 +177,37 @@ const taskService = {
    * @param remark 备注
    * @param tag 任务标签
    */
-  async modifyTask(userId: string, taskId: string, title: string, priority: -2 | -1 | 0 | 1 | 2 = 0, remark: string, tag: string[]) {
+  async modifyTask(
+    userId: string,
+    taskId: string,
+    title: string,
+    priority: -2 | -1 | 0 | 1 | 2 = 0,
+    remark: string,
+    tag: string[],
+    scheduledTaskTime: Date,
+    attachmentsPath: object,
+    rrule: string,
+  ) {
     try {
       const result = await prisma.task.findUnique({ where: { id: taskId }, select: { own_user_id: true } })
       if (result && result.own_user_id !== userId) {
         return 'noSuchTask'
       }
-      const data = await prisma.task.update({ where: { id: taskId }, data: { title, priority, remark, tag, update_time: new Date() } })
+      const data = await prisma.task.update({
+        where: {
+          id: taskId,
+        },
+        data: {
+          title,
+          priority,
+          remark,
+          tag,
+          update_time: new Date(),
+          scheduled_task_time: scheduledTaskTime,
+          attachments_path: attachmentsPath,
+          rrule,
+        },
+      })
       return data
     }
     catch (err) {

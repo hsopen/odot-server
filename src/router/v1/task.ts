@@ -4,6 +4,8 @@ import { getUserIdFromToken } from './middleware/authMiddleware'
 
 const router = express.Router()
 
+router.put('/uploadTaskAttachment', getUserIdFromToken, taskController.uploadTaskAttachment)
+
 /**
  * 获取今日任务
  */

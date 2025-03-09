@@ -1,8 +1,46 @@
 import type { NextFunction, Request, Response } from 'express'
+import multer from 'multer'
 import taskService from '../services/taskService'
 import { resHandler } from '../utils/resHandler'
 
 const taskController = {
+
+  async uploadTaskAttachment(req: Request, res: Response, _next: NextFunction) {
+    const storage = multer.memoryStorage()
+    const upload = multer({ storage })
+
+    // 处理文件上传
+    upload.single('file')(req, res, async (err) => {
+      if (err) {
+        return resHandler(res, 400, false, 'Error uploading file')
+      }
+
+      // 获取文件 buffer 和原始文件名
+      const fileBuffer = req.file?.buffer
+      const originalFileName = req.file?.originalname
+      const taskId = req.body.taskId // 从 form-data 获取 taskId
+      if (!taskId) {
+        return resHandler(res, 404, false, 'taskIdIsEmpty')
+      }
+      // 验证是否获取到了必要的数据
+      if (!fileBuffer || !originalFileName) {
+        return resHandler(res, 400, false, 'No file uploaded')
+      }
+      if (!taskId) {
+        return resHandler(res, 400, false, 'Task ID is required')
+      }
+
+      // 调用业务逻辑上传附件
+      try {
+        await taskService.uploadAttachment(res.locals.userId, taskId, fileBuffer, originalFileName)
+        return resHandler(res, 200, true, 'File uploaded successfully')
+      }
+      catch (error) {
+        console.error('Error uploading attachment:', error)
+        return resHandler(res, 500, false, 'Error processing the attachment')
+      }
+    })
+  },
 
   /**
    * 获取今日的预定任务
@@ -65,6 +103,9 @@ const taskController = {
       req.body.priority,
       req.body.remark,
       req.body.tag,
+      req.body.scheduled_task_time,
+      req.body.attachments_path,
+      req.body.rrule,
     )
     if (result === 'modificationFailed') {
       resHandler(res, 500, false, 'modificationFailed')

@@ -43,7 +43,7 @@ const s3Service = {
     try {
       // 检查文件大小
       if (file instanceof Buffer && file.length > fileSize) {
-        throw new Error('File size exceeds the 5MB limit')
+        throw new Error('File size exceeds the limit')
       }
       // 上传文件
       await client.put(filePath, file)
