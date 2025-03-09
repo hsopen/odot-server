@@ -104,7 +104,6 @@ const taskController = {
       req.body.remark,
       req.body.tag,
       req.body.scheduled_task_time,
-      req.body.attachments_path,
       req.body.rrule,
     )
     if (result === 'modificationFailed') {

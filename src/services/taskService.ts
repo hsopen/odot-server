@@ -185,7 +185,6 @@ const taskService = {
     remark: string,
     tag: string[],
     scheduledTaskTime: Date,
-    attachmentsPath: object,
     rrule: string,
   ) {
     try {
@@ -204,7 +203,6 @@ const taskService = {
           tag,
           update_time: new Date(),
           scheduled_task_time: scheduledTaskTime,
-          attachments_path: attachmentsPath,
           rrule,
         },
       })
