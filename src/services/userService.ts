@@ -93,6 +93,9 @@ const userService = {
       password = generateHashPassword(result.salt + password)
       if (result.password === password) {
         await prisma.user.delete({ where: { id } })
+        console.log(`${id}/`)
+
+        await s3Service.deleteFolder(`${id}/`)
         return true
       }
       return false

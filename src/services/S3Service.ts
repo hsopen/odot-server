@@ -56,6 +56,61 @@ const s3Service = {
       return false
     }
   },
+
+  /**
+   * 删除文件
+   * @param filePath 文件路径
+   * @returns 是否删除成功
+   */
+  async deleteFile(filePath: string): Promise<boolean> {
+    try {
+      await client.delete(filePath)
+      return true
+    }
+    catch (error) {
+      logger.error('Error deleting file:', error)
+      return false
+    }
+  },
+
+  /**
+   * 删除文件夹（删除所有以该前缀开头的文件）
+   * @param folderPath 文件夹路径（以 `/` 结尾）
+   * @returns 是否删除成功
+   */
+  async deleteFolder(folderPath: string): Promise<boolean> {
+    try {
+      let hasMore = true
+      let marker: string | undefined
+
+      while (hasMore) {
+        // 调用 list 方法时，传递两个参数：query 和 options
+        const result = await client.list(
+          {
+            'prefix': folderPath,
+            marker,
+            'max-keys': 1000, // 每次最多列出1000个文件
+          },
+          {}, // 第二个参数是 options，可以为空对象
+        )
+
+        if (result.objects && result.objects.length > 0) {
+          const deleteObjects = result.objects.map(obj => obj.name)
+          await client.deleteMulti(deleteObjects)
+        }
+
+        // 检查是否还有更多文件
+        hasMore = result.isTruncated
+        marker = result.nextMarker
+      }
+
+      return true
+    }
+    catch (error) {
+      logger.error('Error deleting folder:', error)
+      return false
+    }
+  },
 }
 
 export default s3Service
