@@ -84,9 +84,15 @@ const taskService = {
         cursor: cursor ? { id: cursor } : undefined, // 如果提供了cursor，则从该记录开始获取
         take, // 每次获取的记录数
         skip: cursor ? 1 : 0, // 如果提供了cursor，则跳过该记录
-        orderBy: {
-          scheduled_task_time: 'asc', // 按id升序排列
-        },
+        orderBy: [
+          {
+            scheduled_task_time: 'asc',
+
+          },
+          {
+            creation_time: 'asc',
+          },
+        ],
       })
 
       // 返回结果以及最后一个记录的id，用于下一次请求的cursor
