@@ -42,7 +42,7 @@ const taskController = {
    * @param _next
    */
   async getAllTasks(req: Request, res: Response, _next: NextFunction) {
-    const result = await taskService.getAllTasks(res.locals.userId)
+    const result = await taskService.getAllTasks(res.locals.userId, req.query.cursor as string)
     if (result === 'queryFailed') {
       resHandler(res, 500, false, 'fetchFailure')
     }

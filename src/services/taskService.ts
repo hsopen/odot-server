@@ -75,14 +75,25 @@ const taskService = {
    * 获取用户所有任务
    * @param userId 用户id
    */
-  async getAllTasks(userId: string) {
+  async getAllTasks(userId: string, cursor?: string, take: number = 10) {
     try {
       const result = await prisma.task.findMany({
         where: {
           own_user_id: userId,
         },
+        cursor: cursor ? { id: cursor } : undefined, // 如果提供了cursor，则从该记录开始获取
+        take, // 每次获取的记录数
+        skip: cursor ? 1 : 0, // 如果提供了cursor，则跳过该记录
+        orderBy: {
+          scheduled_task_time: 'asc', // 按id升序排列
+        },
       })
-      return result
+
+      // 返回结果以及最后一个记录的id，用于下一次请求的cursor
+      return {
+        tasks: result,
+        nextCursor: result.length > 0 ? result[result.length - 1].id : null,
+      }
     }
     catch (err) {
       logger.error(err)
