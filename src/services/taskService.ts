@@ -10,6 +10,24 @@ import s3Service from './S3Service'
 
 const taskService = {
 
+  /**
+   * 下载任务附件
+   * @param userId 用户id
+   * @param filePath
+   * @returns 返回结果
+   */
+  async downloadAttachment(userId: string, filePath: string) {
+    const reFilePath = `${userId}/${filePath.includes('/') ? filePath.split('/').slice(1).join('/') : filePath}`
+    const result = await s3Service.getFileSignature(reFilePath)
+    return result
+  },
+
+  /**
+   * 删除任务附件
+   * @param userId 用户id
+   * @param taskId 任务id
+   * @param filePath 文件路径
+   */
   async deleteTaskAttachment(userId: string, taskId: string, filePath: string) {
     // 删除 S3 中的文件
     await s3Service.deleteFile(filePath)

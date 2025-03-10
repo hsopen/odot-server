@@ -5,6 +5,11 @@ import { getUserIdFromToken } from './middleware/authMiddleware'
 const router = express.Router()
 
 /**
+ * 获取附件预签名链接
+ */
+router.post('/downloadAttachment', getUserIdFromToken, taskController.downloadAttachment)
+
+/**
  * 删除附件
  */
 router.post('/deleteTaskAttachment', getUserIdFromToken, taskController.deleteTaskAttachment)

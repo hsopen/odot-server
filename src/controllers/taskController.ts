@@ -5,6 +5,28 @@ import { resHandler } from '../utils/resHandler'
 
 const taskController = {
 
+  /**
+   * 获取下载附件
+   * @param req
+   * @param res
+   * @param _next
+   */
+  async downloadAttachment(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const result = await taskService.downloadAttachment(res.locals.userId, req.body.filePath)
+      resHandler(res, 200, true, 'getDownloadLinkSuccess', result)
+    }
+    catch {
+      resHandler(res, 500, false, 'downloadFailed')
+    }
+  },
+
+  /**
+   * 删除附件
+   * @param req
+   * @param res
+   * @param _next
+   */
   async deleteTaskAttachment(req: Request, res: Response, _next: NextFunction) {
     try {
       const result = await taskService.deleteTaskAttachment(res.locals.userId, req.body.taskId, req.body.filePath)
