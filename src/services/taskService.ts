@@ -10,6 +10,40 @@ import s3Service from './S3Service'
 
 const taskService = {
 
+  async retrieveImportantTasks(userId: string, cursor?: string, take: number = 10) {
+    const result = await prisma.task.findMany({
+      where: {
+        own_user_id: userId,
+        status: false,
+        priority: {
+          gt: 0, // 筛选 priority 大于 0 的任务
+        },
+      },
+      orderBy: [
+        {
+          priority: 'desc', // 1. priority 从大到小排序
+        },
+        {
+          scheduled_task_time: {
+            sort: 'asc', // 2. scheduled_task_time 从旧到新排序
+            nulls: 'last', // 将 null 值放在最后
+          },
+        },
+        {
+          creation_time: 'asc', // 3. creation_time 从旧到新排序
+        },
+      ],
+      cursor: cursor ? { id: cursor } : undefined,
+      take, // 每次获取的记录数
+      skip: cursor ? 1 : 0, // 如果提供了 cursor，则跳过该记录
+    })
+
+    return {
+      tasks: result,
+      nextCursor: result.length > 0 ? result[result.length - 1].id : null,
+    }
+  },
+
   /**
    * 下载任务附件
    * @param userId 用户id

@@ -5,6 +5,16 @@ import { resHandler } from '../utils/resHandler'
 
 const taskController = {
 
+  async retrieveImportantTasks(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const result = await taskService.retrieveImportantTasks(res.locals.userId, req.query.cursor as string)
+      resHandler(res, 200, true, 'successAcquired', result)
+    }
+    catch {
+      resHandler(res, 500, false, 'getFailure')
+    }
+  },
+
   /**
    * 获取下载附件
    * @param req
