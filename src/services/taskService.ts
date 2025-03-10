@@ -1,5 +1,6 @@
 import type { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
+import { Prisma } from '@prisma/client'
 import { endOfDay, startOfDay } from 'date-fns'
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 import { v7 as uuidv7 } from 'uuid'
@@ -9,6 +10,54 @@ import s3Service from './S3Service'
 
 const taskService = {
 
+  async deleteTaskAttachment(userId: string, taskId: string, filePath: string) {
+    // 删除 S3 中的文件
+    await s3Service.deleteFile(filePath)
+
+    // 获取当前的 attachments_path
+    const task = await prisma.task.findUnique({
+      where: { id: taskId, own_user_id: userId },
+      select: { attachments_path: true },
+    })
+
+    if (!task) {
+      throw new Error('Task not found')
+    }
+
+    // 确保 attachments_path 是数组
+    let attachmentsPath: { attachmentsName: string, attachments_path: string }[] = []
+
+    if (task.attachments_path && typeof task.attachments_path === 'object') {
+      try {
+        attachmentsPath = Array.isArray(task.attachments_path)
+          ? task.attachments_path as { attachmentsName: string, attachments_path: string }[]
+          : []
+      }
+      catch (error) {
+        console.error('Error parsing attachments_path:', error)
+      }
+    }
+
+    // 过滤掉匹配的文件路径
+    const updatedAttachments = attachmentsPath.filter(
+      attachment => attachment.attachments_path !== filePath,
+    )
+
+    // 更新数据库中的 attachments_path
+    const resutl = await prisma.task.update({
+      where: { id: taskId },
+      data: { attachments_path: updatedAttachments.length ? updatedAttachments as any : Prisma.JsonNull },
+    })
+    return resutl
+  },
+
+  /**
+   * 上传任务附件
+   * @param userId 用户id
+   * @param taskId 任务id
+   * @param fileBuffer 文件
+   * @param originalFileName 文件名字
+   */
   async uploadAttachment(userId: string, taskId: string, fileBuffer: Buffer, originalFileName: string) {
     try {
       // 计算文件 MD5 值
@@ -58,7 +107,7 @@ const taskService = {
         },
       })
 
-      return true
+      return updatedAttachments
     }
     catch (error) {
       console.error('Error updating attachments:', error)

@@ -4,6 +4,14 @@ import { getUserIdFromToken } from './middleware/authMiddleware'
 
 const router = express.Router()
 
+/**
+ * 删除附件
+ */
+router.post('/deleteTaskAttachment', getUserIdFromToken, taskController.deleteTaskAttachment)
+
+/**
+ * 上传附件
+ */
 router.put('/uploadTaskAttachment', getUserIdFromToken, taskController.uploadTaskAttachment)
 
 /**

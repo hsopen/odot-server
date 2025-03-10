@@ -5,6 +5,22 @@ import { resHandler } from '../utils/resHandler'
 
 const taskController = {
 
+  async deleteTaskAttachment(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const result = await taskService.deleteTaskAttachment(res.locals.userId, req.body.taskId, req.body.filePath)
+      resHandler(res, 200, true, 'deletionSuccessful', result)
+    }
+    catch {
+      resHandler(res, 500, false, 'deleteError')
+    }
+  },
+
+  /**
+   * 上传文件api
+   * @param req
+   * @param res
+   * @param _next
+   */
   async uploadTaskAttachment(req: Request, res: Response, _next: NextFunction) {
     const storage = multer.memoryStorage()
     const upload = multer({ storage })
@@ -17,11 +33,8 @@ const taskController = {
 
       // 获取文件 buffer 和原始文件名
       const fileBuffer = req.file?.buffer
-      const originalFileName = req.file?.originalname
+      const originalFileName = decodeURIComponent(req.file?.originalname as string)
       const taskId = req.body.taskId // 从 form-data 获取 taskId
-      if (!taskId) {
-        return resHandler(res, 404, false, 'taskIdIsEmpty')
-      }
       // 验证是否获取到了必要的数据
       if (!fileBuffer || !originalFileName) {
         return resHandler(res, 400, false, 'No file uploaded')
@@ -32,8 +45,8 @@ const taskController = {
 
       // 调用业务逻辑上传附件
       try {
-        await taskService.uploadAttachment(res.locals.userId, taskId, fileBuffer, originalFileName)
-        return resHandler(res, 200, true, 'File uploaded successfully')
+        const result = await taskService.uploadAttachment(res.locals.userId, taskId, fileBuffer, originalFileName)
+        return resHandler(res, 200, true, 'File uploaded successfully', { taskId, result })
       }
       catch (error) {
         console.error('Error uploading attachment:', error)
@@ -85,7 +98,7 @@ const taskController = {
       resHandler(res, 500, false, 'fetchFailure')
     }
     else {
-      resHandler(res, 200, true, '获取成功', result)
+      resHandler(res, 200, true, 'successObtained', result)
     }
   },
 
