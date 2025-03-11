@@ -248,11 +248,11 @@ const taskService = {
         skip: cursor ? 1 : 0, // 如果提供了cursor，则跳过该记录
         orderBy: [
           {
-            scheduled_task_time: 'asc',
 
+            creation_time: 'desc',
           },
           {
-            creation_time: 'asc',
+            scheduled_task_time: 'asc',
           },
         ],
       })
