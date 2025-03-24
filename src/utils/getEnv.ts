@@ -30,4 +30,6 @@ export default {
   S3_SECRET: env.get('S3_SECRET').required().asString(),
   S3_REGION: env.get('S3_REGION').required().asString(),
   S3_BUCKET: env.get('S3_BUCKET').required().asString(),
+
+  CORS: env.get('CORS').required().asUrlString(),
 }

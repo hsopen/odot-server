@@ -7,7 +7,7 @@ import logger from './utils/logger'
 const app = express()
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: getEnv.CORS,
   credentials: true,
 }))
 
