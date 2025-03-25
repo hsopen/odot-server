@@ -4,6 +4,50 @@ import taskService from '../services/taskService'
 import { resHandler } from '../utils/resHandler'
 
 const taskController = {
+/**
+ * 获取指定日期范围内的任务控制器
+ * @param req
+ * @param res
+ * @param _next
+ */
+  async getTasksByDateRange(req: Request, res: Response, _next: NextFunction) {
+    try {
+    // 从请求中获取开始日期、结束日期和时区
+      const startDate = new Date(req.query.startDate as string)
+      const endDate = new Date(req.query.endDate as string)
+      const timeZone = req.query.timeZone as string || 'UTC'
+
+      // 验证日期格式是否正确
+      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return resHandler(res, 400, false, 'invalidDateFormat')
+      }
+
+      // 验证开始日期是否早于或等于结束日期
+      if (startDate > endDate) {
+        return resHandler(res, 400, false, 'startDateAfterEndDate')
+      }
+
+      // 调用服务层方法获取日期范围内的任务
+      const result = await taskService.getTasksByDateRange(
+        res.locals.userId,
+        startDate,
+        endDate,
+        timeZone,
+      )
+
+      // 处理可能的错误情况
+      if (result.error) {
+        return resHandler(res, 500, false, 'fetchFailure', { error: result.error })
+      }
+
+      // 返回成功结果
+      resHandler(res, 200, true, 'successFetched', result)
+    }
+    catch (error) {
+      console.error('获取日期范围内的任务失败:', error)
+      resHandler(res, 500, false, 'fetchFailure')
+    }
+  },
 
   async retrieveImportantTasks(req: Request, res: Response, _next: NextFunction) {
     try {
@@ -125,7 +169,7 @@ const taskController = {
    * @param _next
    */
   async getAllTasks(req: Request, res: Response, _next: NextFunction) {
-    const result = await taskService.getAllTasks(res.locals.userId, req.query.cursor as string)
+    const result = await taskService.getAllTasks(res.locals.userId, req.query.cursor as string, Number(req.query.take))
     if (result === 'queryFailed') {
       resHandler(res, 500, false, 'fetchFailure')
     }
@@ -169,7 +213,7 @@ const taskController = {
    * @param _next
    */
   async createTask(req: Request, res: Response, _next: NextFunction) {
-    if (await taskService.createTask(res.locals.userId, req.body.title, req.body.priority, req.body.remark)) {
+    if (await taskService.createTask(res.locals.userId, req.body.title, req.body.priority, req.body.scheduled_task_time)) {
       resHandler(res, 200, true, 'creationSuccess')
       return
     }

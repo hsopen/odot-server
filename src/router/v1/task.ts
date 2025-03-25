@@ -4,6 +4,8 @@ import { getUserIdFromToken } from './middleware/authMiddleware'
 
 const router = express.Router()
 
+router.get('/getTasksByDateRange', getUserIdFromToken, taskController.getTasksByDateRange)
+
 /**
  * 获取重要任务列表
  */

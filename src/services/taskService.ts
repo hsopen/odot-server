@@ -10,6 +10,69 @@ import s3Service from './S3Service'
 
 const taskService = {
 
+  /**
+   * 获取指定日期范围内的任务
+   * @param userId 用户id
+   * @param startDate 开始日期
+   * @param endDate 结束日期
+   * @param timeZone 时区
+   * @returns 返回指定日期范围内的任务记录
+   */
+  async getTasksByDateRange(userId: string, startDate: Date, endDate: Date, timeZone: string) {
+    try {
+    // 将输入的日期转换为传入时区的时间
+      const zonedStartDate = toZonedTime(startDate, timeZone)
+      const zonedEndDate = toZonedTime(endDate, timeZone)
+
+      // 获取传入时区的开始日期的开始时间和结束日期的结束时间
+      const startOfDayZoned = startOfDay(zonedStartDate)
+      const endOfDayZoned = endOfDay(zonedEndDate)
+
+      // 将时区时间转换为 UTC 时间，以便与数据库中的 timestamptz 字段比较
+      const startOfDayUTC = fromZonedTime(startOfDayZoned, timeZone)
+      const endOfDayUTC = fromZonedTime(endOfDayZoned, timeZone)
+
+      // 查询指定日期范围内的任务记录
+      const tasks = await prisma.task.findMany({
+        where: {
+          own_user_id: userId,
+          scheduled_task_time: {
+            gte: startOfDayUTC.toISOString(),
+            lte: endOfDayUTC.toISOString(),
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          scheduled_task_time: true,
+          status: true,
+          priority: true,
+        },
+        orderBy: [
+          {
+            scheduled_task_time: 'asc',
+          },
+          {
+            priority: 'desc',
+          },
+        ],
+      })
+
+      return {
+        tasks,
+        count: tasks.length,
+      }
+    }
+    catch (err) {
+      logger.error('获取日期范围内的任务失败:', err)
+      return {
+        tasks: [],
+        count: 0,
+        error: '查询失败',
+      }
+    }
+  },
+
   async retrieveImportantTasks(userId: string, cursor?: string, take: number = 10) {
     const result = await prisma.task.findMany({
       where: {
@@ -327,7 +390,7 @@ const taskService = {
     userId: string,
     title: string,
     priority: -2 | -1 | 0 | 1 | 2 = 0,
-    remark: string,
+    scheduled_task_time: Date,
   ): Promise<boolean> {
     try {
       const id = uuidv7()
@@ -336,11 +399,11 @@ const taskService = {
           id,
           own_user_id: userId,
           title,
-          remark,
           status: false,
           priority,
           creation_time: new Date(),
           update_time: new Date(),
+          scheduled_task_time,
         },
       })
       return true
