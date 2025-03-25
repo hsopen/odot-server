@@ -46,7 +46,7 @@ const authController = {
 
       data.remember
         ? res.cookie('token', token, { maxAge: getEnv.JWT_TOKEN_COOKIE_MAX_AGE, httpOnly: getEnv.COOKIE_HTTP_ONLY, secure: getEnv.COOKIE_SECURE, sameSite: getEnv.COOKIE_SAME_SITE })
-        : res.cookie('token', token, {})
+        : res.cookie('token', token, { httpOnly: getEnv.COOKIE_HTTP_ONLY, secure: getEnv.COOKIE_SECURE, sameSite: getEnv.COOKIE_SAME_SITE })
       resHandler(res, 200, true, 'login successfully')
     }
     else if (result === 'loginFailed') {
