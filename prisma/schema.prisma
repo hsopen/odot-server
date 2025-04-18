@@ -21,6 +21,7 @@ model task {
   tag                 String[]  @db.VarChar
   scheduled_task_time DateTime? @db.Timestamptz(6)
   rrule               String?
+  user                user      @relation(fields: [own_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "task_user_fk")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -32,4 +33,5 @@ model user {
   nickname                                    String   @db.VarChar(255)
   creation_time                               DateTime @db.Timestamptz(6)
   certification_information_modification_time DateTime @db.Timestamptz(6)
+  task                                        task[]
 }

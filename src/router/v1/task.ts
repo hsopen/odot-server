@@ -3,7 +3,14 @@ import taskController from '../../controllers/taskController'
 import { getUserIdFromToken } from './middleware/authMiddleware'
 
 const router = express.Router()
+/**
+ * 搜索任务
+ */
+router.get('/searchTasks', getUserIdFromToken, taskController.searchTasks)
 
+/**
+ * 获取指定如期范围的任务
+ */
 router.get('/getTasksByDateRange', getUserIdFromToken, taskController.getTasksByDateRange)
 
 /**

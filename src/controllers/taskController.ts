@@ -4,12 +4,45 @@ import taskService from '../services/taskService'
 import { resHandler } from '../utils/resHandler'
 
 const taskController = {
-/**
- * 获取指定日期范围内的任务控制器
- * @param req
- * @param res
- * @param _next
- */
+
+  async searchTasks(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const query = req.query.q as string
+      const cursor = req.query.cursor as string | undefined
+      const take = req.query.take ? Number(req.query.take) : 10
+
+      // Validate query parameter
+      if (!query || typeof query !== 'string' || query.trim().length === 0) {
+        return resHandler(res, 400, false, 'searchQueryRequired')
+      }
+
+      // Call the service layer
+      const result = await taskService.searchTasks(
+        res.locals.userId,
+        query.trim(),
+        cursor,
+        take,
+      )
+
+      // Return the search results
+      resHandler(res, 200, true, 'searchSuccess', {
+        tasks: result.tasks,
+        nextCursor: result.nextCursor,
+        count: result.count,
+      })
+    }
+    catch (error) {
+      console.error('Search tasks failed:', error)
+      resHandler(res, 500, false, 'searchFailed')
+    }
+  },
+
+  /**
+   * 获取指定日期范围内的任务控制器
+   * @param req
+   * @param res
+   * @param _next
+   */
   async getTasksByDateRange(req: Request, res: Response, _next: NextFunction) {
     try {
     // 从请求中获取开始日期、结束日期和时区

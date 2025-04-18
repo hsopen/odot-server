@@ -11,6 +11,85 @@ import s3Service from './S3Service'
 const taskService = {
 
   /**
+   * 搜索任务
+   * @param userId 用户id
+   * @param query 查询字符串
+   * @param cursor 上一个任务id
+   * @param take 一次多少个
+   */
+  async searchTasks(
+    userId: string,
+    query: string,
+    cursor?: string,
+    take: number = 10,
+  ): Promise<{
+      tasks: any[]
+      nextCursor: string | null
+      count: number
+    }> {
+    try {
+      if (!query.trim()) {
+        return {
+          tasks: [],
+          nextCursor: null,
+          count: 0,
+        }
+      }
+
+      // 创建搜索条件数组
+      const searchConditions: Prisma.taskWhereInput[] = [
+        { title: { contains: query, mode: 'insensitive' } },
+        { remark: { contains: query, mode: 'insensitive' } },
+        { tag: { has: query } }, // 检查标签数组中是否包含查询字符串
+      ]
+
+      // 查询匹配的任务
+      const result = await prisma.task.findMany({
+        where: {
+          AND: [
+            { own_user_id: userId },
+            {
+              OR: searchConditions,
+            },
+          ],
+        },
+        cursor: cursor ? { id: cursor } : undefined,
+        take,
+        skip: cursor ? 1 : 0,
+        orderBy: {
+          creation_time: 'desc',
+        },
+      })
+
+      // 获取总匹配数
+      const count = await prisma.task.count({
+        where: {
+          AND: [
+            { own_user_id: userId },
+            {
+              OR: searchConditions,
+            },
+          ],
+        },
+      })
+
+      return {
+        tasks: result,
+        nextCursor: result.length > 0 ? result[result.length - 1].id : null,
+        count,
+      }
+    }
+    catch (err) {
+      logger.error('搜索任务失败:', err)
+      return {
+        tasks: [],
+        nextCursor: null,
+        count: 0,
+      }
+    }
+  },
+
+  /**
    * 获取指定日期范围内的任务
    * @param userId 用户id
    * @param startDate 开始日期
@@ -20,7 +99,7 @@ const taskService = {
    */
   async getTasksByDateRange(userId: string, startDate: Date, endDate: Date, timeZone: string) {
     try {
-    // 将输入的日期转换为传入时区的时间
+      // 将输入的日期转换为传入时区的时间
       const zonedStartDate = toZonedTime(startDate, timeZone)
       const zonedEndDate = toZonedTime(endDate, timeZone)
 

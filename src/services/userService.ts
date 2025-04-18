@@ -38,7 +38,7 @@ const userService = {
     }
   },
   /**
-   * 用户登录
+   * 生成用户预签名头像
    * @param id 用户id
    * @returns 预签名链接或null
    */
